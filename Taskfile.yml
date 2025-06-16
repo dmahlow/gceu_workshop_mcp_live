@@ -1,0 +1,35 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build the desktop-automation-mcp server binary
+    cmds:
+      - go build -o mcp-server ./cmd/mcp-server
+
+  run:
+    desc: Run the desktop-automation-mcp server
+    cmds:
+      - task: build
+      - ./mcp-server
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -f mcp-server
+      - go clean
+
+  deps:
+    desc: Download dependencies
+    cmds:
+      - go mod download
+      - go mod tidy
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test ./...
+
+  install:
+    desc: Install the binary to GOPATH/bin
+    cmds:
+      - go install ./cmd/mcp-server
