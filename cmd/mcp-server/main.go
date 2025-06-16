@@ -263,6 +263,44 @@ func main() {
 		return mcp.NewToolResultText(fmt.Sprintf("Double clicked at (%d, %d)", int(x), int(y))), nil
 	})
 
+	// Add take screenshot tool
+	takeScreenshotTool := mcp.NewTool("take_screenshot",
+		mcp.WithDescription("Capture a screenshot of the screen"),
+		mcp.WithString("path",
+			mcp.Description("Optional path to save the screenshot (if not provided, saves to temp directory)"),
+		),
+	)
+
+	s.AddTool(takeScreenshotTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		args := request.GetArguments()
+		pathRaw, hasPath := args["path"]
+
+		if hasPath && pathRaw != nil {
+			path := pathRaw.(string)
+			err := automation.CaptureScreenshotToPath(path)
+			if err != nil {
+				return mcp.NewToolResultError(fmt.Sprintf("Screenshot failed: %v", err)), nil
+			}
+			return mcp.NewToolResultText(fmt.Sprintf("Screenshot saved to: %s", path)), nil
+		} else {
+			path, err := automation.CaptureScreenshot()
+			if err != nil {
+				return mcp.NewToolResultError(fmt.Sprintf("Screenshot failed: %v", err)), nil
+			}
+			return mcp.NewToolResultText(fmt.Sprintf("Screenshot saved to: %s", path)), nil
+		}
+	})
+
+	// Add get screen size tool
+	getScreenSizeTool := mcp.NewTool("get_screen_size",
+		mcp.WithDescription("Get the screen dimensions"),
+	)
+
+	s.AddTool(getScreenSizeTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		width, height := automation.GetScreenSize()
+		return mcp.NewToolResultText(fmt.Sprintf("Screen size: %dx%d", width, height)), nil
+	})
+
 	// Start the stdio server
 	log.Println("Starting Desktop Automation MCP Server...")
 	if err := server.ServeStdio(s); err != nil {
