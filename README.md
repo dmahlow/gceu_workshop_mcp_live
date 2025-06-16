@@ -4,17 +4,20 @@ A Model Context Protocol (MCP) server that exposes desktop automation capabiliti
 
 ## Overview
 
-This MCP server provides a bridge between LLM applications and desktop automation functionality. It exposes mouse and keyboard automation capabilities through the MCP protocol, enabling AI assistants to:
+This MCP server provides a bridge between LLM applications and desktop automation functionality. It exposes mouse, keyboard, and screen automation capabilities through the MCP protocol, enabling AI assistants to:
 
 - Click, right-click, and double-click at specific coordinates
 - Move the mouse cursor with smooth or instant movement
 - Type text with optional character delays
 - Press individual keys or key combinations
 - Get current mouse cursor position
+- Capture screenshots of the desktop
+- Get screen dimensions
 
 ## Features
 
 ### Mouse Automation
+
 - **Click**: Left click at specified coordinates
 - **Right Click**: Right click at specified coordinates
 - **Double Click**: Double click at specified coordinates
@@ -22,9 +25,15 @@ This MCP server provides a bridge between LLM applications and desktop automatio
 - **Get Position**: Retrieve current mouse coordinates
 
 ### Keyboard Automation
+
 - **Type Text**: Type text at current cursor position
 - **Press Key**: Press individual keys or key combinations
 - **Delayed Typing**: Type with configurable delays between characters
+
+### Screen Automation
+
+- **Take Screenshot**: Capture the full screen and save to file
+- **Get Screen Size**: Retrieve screen dimensions
 
 ## Installation
 
@@ -87,53 +96,80 @@ Configure your LLM application (Claude Desktop, etc.) to connect to this MCP ser
 ## Available Tools
 
 ### `click`
+
 Click at specified screen coordinates.
 
 **Parameters:**
+
 - `x` (number, required): X coordinate
 - `y` (number, required): Y coordinate
 
 ### `right_click`
+
 Right click at specified screen coordinates.
 
 **Parameters:**
+
 - `x` (number, required): X coordinate
 - `y` (number, required): Y coordinate
 
 ### `double_click`
+
 Double click at specified screen coordinates.
 
 **Parameters:**
+
 - `x` (number, required): X coordinate
 - `y` (number, required): Y coordinate
 
 ### `move_mouse`
+
 Move mouse cursor to specified coordinates.
 
 **Parameters:**
+
 - `x` (number, required): X coordinate
 - `y` (number, required): Y coordinate
 - `smooth` (boolean, optional): Use smooth movement animation
 - `duration` (number, optional): Duration for smooth movement in seconds (default: 1.0)
 
 ### `get_mouse_position`
+
 Get current mouse cursor position.
 
 **Parameters:** None
 
 ### `type_text`
+
 Type text at current cursor position.
 
 **Parameters:**
+
 - `text` (string, required): Text to type
 - `delay` (number, optional): Delay between characters in milliseconds
 
 ### `press_key`
+
 Press a key or key combination.
 
 **Parameters:**
+
 - `key` (string, required): Key to press (e.g., 'enter', 'space', 'ctrl')
 - `modifiers` (array, optional): Modifier keys (e.g., ['ctrl', 'shift'])
+
+### `take_screenshot`
+
+Capture a screenshot of the screen.
+
+**Parameters:**
+
+- `path` (string, optional): Path to save the screenshot (if not provided, saves to temp directory)
+
+### `get_screen_size`
+
+Get the screen dimensions.
+
+**Parameters:** None
 
 ## Architecture
 
@@ -145,7 +181,8 @@ desktop-automation-mcp/
 ├── internal/
 │   └── automation/          # Desktop automation logic (copied from desktop-automation)
 │       ├── keyboard.go
-│       └── mouse.go
+│       ├── mouse.go
+│       └── screen.go
 ├── go.mod                   # Go module definition
 ├── Taskfile.yml            # Task runner configuration
 ├── .gitignore              # Git ignore rules
@@ -208,6 +245,7 @@ rm -f mcp-server
 ## Platform Support
 
 This server supports the same platforms as robotgo:
+
 - Windows
 - macOS
 - Linux
